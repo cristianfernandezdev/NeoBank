@@ -30,4 +30,13 @@ public class AccountJpaEntity {
     // Precisión bancaria para el dinero
     @Column(nullable = false, precision = 19, scale = 4)
     private BigDecimal balance;
+
+    @Column(nullable = false, length = 3)
+    private String currency;
+
+    @Column(nullable = false, length = 20)
+    private String status;
+
+    @Column(name = "created_at", nullable = false)
+    private java.time.Instant createdAt;
 }

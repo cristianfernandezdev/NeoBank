@@ -1,19 +1,6 @@
 spring:
   application:
-    name: neobank-core
+    name: neobank-core  # Nombre de la aplicación — común a todos los perfiles
 
-  datasource:
-    url: jdbc:h2:mem:neobank_core
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
-
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-    hibernate:
-      # Como la base de datos se borra al apagar, dejamos que Spring cree las tablas por hoy
-      ddl-auto: create-drop
+server:
+  port: 8080  # Puerto HTTP — común a todos los perfiles

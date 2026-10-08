@@ -6,6 +6,7 @@ import org.neobank.application.port.out.SaveAccountPort;
 import org.neobank.domain.model.Account;
 import org.springframework.stereotype.Service;
 
+import java.util.Currency;
 import java.util.UUID;
 
 @Service
@@ -17,9 +18,9 @@ public class AccountService implements CreateAccountUseCase {
     private final SaveAccountPort saveAccountPort;
 
     @Override
-    public UUID create(UUID userId) {
+    public UUID create(UUID userId, Currency currency) {
         // 1. Dominio: Fabricamos la cuenta pura de Java (El balance empieza en cero)
-        Account newAccount = new Account(userId);
+        Account newAccount = new Account(userId,currency);
 
         // 2. Infraestructura: Le decimos al puerto que guarde la cuenta.
         // Spring Boot se encargará mágicamente de llevar esto a tu AccountPersistenceAdapter

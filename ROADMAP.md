@@ -57,9 +57,18 @@ Los conceptos nuevos deben introducirse uno a uno, no todos a la vez.
 | **SOLID estricto** | Los 5 principios aplicados rigurosamente. Interface Segregation en puertos, Constructor Injection siempre |
 | **Java 21 LTS** | Última LTS. Virtual Threads, Pattern Matching completo, Records, Sealed interfaces |
 | **Spring Boot 4.1.1** | Framework principal del ecosistema Java enterprise |
-| **PostgreSQL 16** | Base de datos relacional robusta, estándar en banca |
+| **PostgreSQL 16** | Base de datos relacional robusta, estándar en banca — se usará en AWS al final del curso |
 | **Flyway** | Migraciones versionadas. NUNCA `ddl-auto: update/create` en desarrollo real |
 | **Maven** | Build tool. Ya configurado en el proyecto |
+
+### ⚠️ Decisión sobre base de datos (Octubre 2026)
+
+> **H2 durante todo el desarrollo local. PostgreSQL en AWS al final del curso.**
+>
+> - Durante las Fases 0–8 se usa **H2 en memoria** para no necesitar Docker/PostgreSQL instalado localmente.
+> - Flyway se activa y las migraciones SQL se escriben desde el principio (compatibles con PostgreSQL).
+> - Al final del curso se despliega en **AWS** con PostgreSQL 16 real — el cambio será mínimo gracias a la arquitectura hexagonal (solo cambia la configuración, no el código).
+> - El `docker-compose.yml` con PostgreSQL queda como referencia pero **no se usa en desarrollo local**.
 
 ### Stack tecnológico
 
@@ -247,15 +256,13 @@ Puertos de salida (interfaces en application/port/out/):
 ### Fase 0 — Cimientos: Setup profesional
 > ⏱️ **Semanas 1-2** (~15h) · 🔴 Obligatorio
 
-Montar el entorno de desarrollo real: conectar PostgreSQL, activar Flyway con la primera
-migración, configurar perfiles Spring (`dev`/`test`), y verificar que todo arranca.
+Montar el entorno de desarrollo real: conectar base de datos, activar Flyway con la primera migración, configurar perfiles Spring (`dev`/`test`), y verificar que todo está listo.
 
-- [ ] PostgreSQL corriendo en Docker (`docker compose up -d`)
-- [ ] `application.yml` base + `application-dev.yml` (PostgreSQL) + `application-test.yml` (H2)
-- [ ] `ddl-auto: validate` en dev, `create-drop` solo en test
-- [ ] Primera migración Flyway: `V1__create_accounts_table.sql`
-- [ ] La app arranca con `./mvnw spring-boot:run -Dspring-boot.run.profiles=dev`
-- [ ] Flyway aplica la migración automáticamente al arrancar
+- [x] `application.yml` base + `application-dev.yml` (H2+Flyway) + `application-test.yml` (H2 tests)
+- [x] `ddl-auto: validate` en dev, `create-drop` solo en test
+- [x] Primera migración Flyway: `V1__create_accounts_table.sql`
+- [x] Entidad JPA sincronizada (`AccountJpaEntity` con currency, status, createdAt)
+- [ ] La app arranca con `./mvnw spring-boot:run -Dspring-boot.run.profiles=dev` (Pendiente de instalar Java 21)
 
 ---
 
@@ -439,7 +446,7 @@ Oct 2026                                                         Mar/Abr 2027
 
 ## ✅ Progreso general
 
-- [ ] **Fase 0** — Setup (PostgreSQL, Flyway, perfiles)
+- [x] **Fase 0** — Setup (Perfiles, Flyway, Base de datos en memoria lista)
 - [ ] **Fase 1** — Dominio DDD (Value Objects, Aggregate, Events, Exceptions)
 - [ ] **Fase 2** — Aplicación (Use Cases, Commands, Services)
 - [ ] **Fase 3** — Infraestructura (REST, JPA, Events, Config)
