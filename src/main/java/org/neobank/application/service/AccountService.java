@@ -20,7 +20,7 @@ public class AccountService implements CreateAccountUseCase {
     @Override
     public UUID create(UUID userId, Currency currency) {
         // 1. Dominio: Fabricamos la cuenta pura de Java (El balance empieza en cero)
-        Account newAccount = new Account(userId,currency);
+        Account newAccount = new Account(userId, currency);
 
         // 2. Infraestructura: Le decimos al puerto que guarde la cuenta.
         // Spring Boot se encargará mágicamente de llevar esto a tu AccountPersistenceAdapter

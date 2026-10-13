@@ -32,8 +32,7 @@ public class Account {
 
     // 4. LÓGICA DE NEGOCIO PURA (Refactorizada a Money)
     public void deposit(Money amount) {
-        // La lógica de si es menor a cero y si las divisas coinciden
-        // ahora la hace la clase Money por dentro. Aquí solo sumamos.
+
         this.balance = this.balance.add(amount);
     }
 

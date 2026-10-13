@@ -18,7 +18,10 @@ public class AccountPersistenceAdapter implements SaveAccountPort {
         AccountJpaEntity entity = new AccountJpaEntity(
                 account.getId(),
                 account.getUserId(),
-                account.getBalance()
+                account.getBalance().getAmount(),
+                account.getBalance().getCurrency().getCurrencyCode(),
+                "ACTIVE",
+                java.time.Instant.now()
         );
 
         // 2. Ejecutar la persistencia
