@@ -100,30 +100,32 @@ NeoBank/
 ├── src/main/java/org/neobank/
 │   ├── NeoBankApplication.java
 │   ├── domain/model/
-│   │   ├── Account.java                          ← Aggregate básico
-│   │   └── Money.java                             ← Value Object básico
+│   │   ├── Account.java                          ← Aggregate básico con Money y Currency
+│   │   └── Money.java                             ← Value Object básico (BigDecimal + Currency)
 │   ├── application/
-│   │   ├── port/in/CreateAccountUseCase.java      ← Puerto de entrada
+│   │   ├── port/in/CreateAccountUseCase.java      ← Puerto de entrada con Currency por parámetro
 │   │   ├── port/out/SaveAccountPort.java          ← Puerto de salida
-│   │   └── service/AccountService.java            ← Servicio de aplicación
+│   │   └── service/AccountService.java            ← Servicio de aplicación que orquesta la creación
 │   └── infrastructure/
 │       ├── adapter/in/rest/
-│       │   ├── AccountController.java
-│       │   └── CreateAccountResponse.java
+│       │   ├── AccountController.java             ← Placeholder para endpoints HTTP
+│       │   └── CreateAccountResponse.java         ← Placeholder para DTOs
 │       └── adapter/out/persistence/
-│           ├── AccountJpaEntity.java
-│           ├── AccountPersistenceAdapter.java
-│           └── SpringDataAccountRepository.java
+│           ├── AccountJpaEntity.java              ← Entidad JPA (id, userId, balance, currency, status, createdAt)
+│           ├── AccountPersistenceAdapter.java     ← Adaptador que traduce Account/Money a JPA
+│           └── SpringDataAccountRepository.java   ← Repositorio Spring Data
 ├── src/main/resources/
-│   └── application.yml                            ← H2 en memoria (hay que migrar a PostgreSQL)
-├── docker-compose.yml                             ← PostgreSQL 16 (no conectado aún)
+│   └── application.yml                            ← Configuración base (nombre y puerto)
+├── docker-compose.yml                             ← PostgreSQL 16 (referencia para despliegue final en AWS)
 ├── pom.xml                                        ← Java 21, Spring Boot 4.1.1, Flyway, Lombok
 └── ROADMAP.md
 ```
 
-**Funcional**: Estructura hexagonal básica con un Use Case (crear cuenta).
-**Pendiente**: DDD profundo, testing, Flyway activo, Docker real, Kafka, Redis, seguridad.
-**Problema**: Usa H2 en memoria con `ddl-auto: create-drop`. Flyway está en pom.xml pero no activo.
+**Estado técnico**:
+- **Compilación & Tests**: En **VERDE** con Java 21 LTS (`./mvnw test` pasa sin errores).
+- **Dominio**: `Money` integrado en `Account`. CERO imports de Spring/Jakarta en `domain/`.
+- **Persistencia**: `AccountPersistenceAdapter` mapea `amount` y `currencyCode` a `AccountJpaEntity`.
+- **Pendiente inmediato**: Configurar perfiles Spring (`application-dev.yml` / `application-test.yml`) y crear la primera migración de Flyway (`V1__create_accounts_table.sql`).
 
 ### Reglas de código estrictas
 
@@ -258,11 +260,18 @@ Puertos de salida (interfaces en application/port/out/):
 
 Montar el entorno de desarrollo real: conectar base de datos, activar Flyway con la primera migración, configurar perfiles Spring (`dev`/`test`), y verificar que todo está listo.
 
-- [x] `application.yml` base + `application-dev.yml` (H2+Flyway) + `application-test.yml` (H2 tests)
-- [x] `ddl-auto: validate` en dev, `create-drop` solo en test
-- [x] Primera migración Flyway: `V1__create_accounts_table.sql`
+- [x] Java 21 LTS verificado y Maven en verde (`./mvnw test` ejecutándose sin fallos)
+- [x] `application.yml` base configurado (nombre y puerto)
 - [x] Entidad JPA sincronizada (`AccountJpaEntity` con currency, status, createdAt)
-- [ ] La app arranca con `./mvnw spring-boot:run -Dspring-boot.run.profiles=dev` (Pendiente de instalar Java 21)
+- [x] Adaptador de persistencia (`AccountPersistenceAdapter`) sincronizado con `Money` y `currency`
+- [ ] Crear perfiles: `application-dev.yml` (H2 + Flyway) y `application-test.yml` (H2 tests)
+- [ ] `ddl-auto: validate` en dev, `create-drop` solo en test
+- [ ] Primera migración Flyway: `V1__create_accounts_table.sql`
+- [ ] La app arranca con `./mvnw spring-boot:run -Dspring-boot.run.profiles=dev`
+
+> 💡 **Contexto al retomar en clase / siguiente sesión**:
+> - La app compila al 100% y los tests están en verde.
+> - **Siguiente paso recomendado**: Crear la migración Flyway `V1__create_accounts_table.sql` y los perfiles `application-dev.yml`/`application-test.yml` para cerrar la Fase 0, o bien saltar directamente a la **Fase 1** creando `AccountStatus.java` (Enum) y reforzando `Money.java`.
 
 ---
 
