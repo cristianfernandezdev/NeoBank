@@ -99,33 +99,50 @@ ASPIRACIONAL (post-entrega):
 NeoBank/
 ├── src/main/java/org/neobank/
 │   ├── NeoBankApplication.java
-│   ├── domain/model/
-│   │   ├── Account.java                          ← Aggregate básico con Money y Currency
-│   │   └── Money.java                             ← Value Object básico (BigDecimal + Currency)
+│   ├── domain/
+│   │   ├── model/
+│   │   │   ├── Account.java                          ← Aggregate básico (pendiente refactorizar a Lote 4)
+│   │   │   ├── Money.java                            ← Value Object completo (final, escala 4, equals/hashCode, of/zero)
+│   │   │   ├── AccountId.java                        ← Value Object record tipado (UUID)
+│   │   │   ├── UserId.java                           ← Value Object record tipado (UUID)
+│   │   │   └── AccountStatus.java                    ← Enum rico con allowsOperations() y canBeReactivated()
+│   │   └── exception/
+│   │       ├── DomainException.java                  ← Excepción base abstracta (unchecked)
+│   │       ├── AccountNotFoundException.java         ← Mapea a HTTP 404
+│   │       ├── AccountNotActiveException.java        ← Mapea a HTTP 409
+│   │       ├── CurrencyMismatchException.java        ← Mapea a HTTP 400
+│   │       └── InsufficientFundsException.java       ← Mapea a HTTP 422
 │   ├── application/
-│   │   ├── port/in/CreateAccountUseCase.java      ← Puerto de entrada con Currency por parámetro
-│   │   ├── port/out/SaveAccountPort.java          ← Puerto de salida
-│   │   └── service/AccountService.java            ← Servicio de aplicación que orquesta la creación
+│   │   ├── port/in/CreateAccountUseCase.java          ← Puerto de entrada
+│   │   ├── port/out/SaveAccountPort.java              ← Puerto de salida
+│   │   └── service/AccountService.java                ← Servicio de aplicación
 │   └── infrastructure/
 │       ├── adapter/in/rest/
-│       │   ├── AccountController.java             ← Placeholder para endpoints HTTP
-│       │   └── CreateAccountResponse.java         ← Placeholder para DTOs
+│       │   ├── AccountController.java                 ← Placeholder
+│       │   └── CreateAccountResponse.java             ← Placeholder
 │       └── adapter/out/persistence/
-│           ├── AccountJpaEntity.java              ← Entidad JPA (id, userId, balance, currency, status, createdAt)
-│           ├── AccountPersistenceAdapter.java     ← Adaptador que traduce Account/Money a JPA
-│           └── SpringDataAccountRepository.java   ← Repositorio Spring Data
+│           ├── AccountJpaEntity.java                  ← Entidad JPA
+│           ├── AccountPersistenceAdapter.java         ← Adaptador JPA
+│           └── SpringDataAccountRepository.java       ← Repositorio Spring Data
 ├── src/main/resources/
-│   └── application.yml                            ← Configuración base (nombre y puerto)
-├── docker-compose.yml                             ← PostgreSQL 16 (referencia para despliegue final en AWS)
-├── pom.xml                                        ← Java 21, Spring Boot 4.1.1, Flyway, Lombok
+│   ├── application.yml                                ← Base (puerto 8080, neobank-core)
+│   ├── application-dev.yml                            ← Perfil DEV (H2 en memoria, Flyway ON)
+│   ├── application-test.yml                           ← Perfil TEST (H2 en memoria, ddl create-drop)
+│   ├── application-prod.yml                           ← Perfil PROD (PostgreSQL AWS RDS, ddl validate)
+│   └── db/migration/
+│       └── V1__create_accounts_table.sql              ← Migración inicial de tabla accounts
+├── docker-compose.yml                                 ← PostgreSQL 16 (referencia AWS)
+├── pom.xml                                            ← Java 21 LTS, Spring Boot 4.1.1 (con Flyway y Hikari configurados)
+├── GEMINI.md                                          ← Reglas de pairing: consultar antes de modificar código y explicar decisiones
 └── ROADMAP.md
 ```
 
 **Estado técnico**:
-- **Compilación & Tests**: En **VERDE** con Java 21 LTS (`./mvnw test` pasa sin errores).
-- **Dominio**: `Money` integrado en `Account`. CERO imports de Spring/Jakarta en `domain/`.
-- **Persistencia**: `AccountPersistenceAdapter` mapea `amount` y `currencyCode` a `AccountJpaEntity`.
-- **Pendiente inmediato**: Configurar perfiles Spring (`application-dev.yml` / `application-test.yml`) y crear la primera migración de Flyway (`V1__create_accounts_table.sql`).
+- **Compilación & Tests**: En **VERDE** con Java 21 LTS (`JAVA_HOME=/home/chrferlop/.jdks/ms-21.0.12.1 ./mvnw test` pasa al 100%).
+- **Flyway**: Probado y validado en tiempo real en arranque local con H2 (ejecuta `V1`, crea `flyway_schema_history` y valida con Hibernate).
+- **Perfiles Spring**: Estructura enterprise completa (`application.yml`, `application-dev.yml`, `application-test.yml`, `application-prod.yml`).
+- **Dominio**: Lote 1 (Status, IDs, Excepciones) y Lote 2 (Money refactorizado y documentado) completados. CERO imports de Spring/Jakarta/Lombok en `domain/`.
+- **Pendiente inmediato para siguiente sesión**: **Fase 1 - Lote 3: Domain Events** (`DomainEvent` sealed interface + records de eventos en `org.neobank.domain.event`).
 
 ### Reglas de código estrictas
 
@@ -246,10 +263,11 @@ Puertos de salida (interfaces en application/port/out/):
 
 ### Perfiles de Spring
 
-| Perfil | Base de datos | Flyway | Uso |
-|--------|--------------|--------|-----|
-| `dev` | PostgreSQL (Docker) | ✅ Activo | Desarrollo local |
-| `test` | H2 en memoria | ❌ Desactivado | Tests automáticos |
+| Perfil | Base de datos | Flyway | Hibernate DDL | Uso |
+|--------|--------------|--------|---------------|-----|
+| `dev` | H2 en memoria | ✅ Activo | `validate` | Desarrollo local rápido y seguro |
+| `test` | H2 en memoria | ❌ Desactivado | `create-drop` | Tests automáticos aislados |
+| `prod` | PostgreSQL (AWS RDS) | ✅ Activo | `validate` | Despliegue en la nube (datos reales seguros) |
 
 ---
 
@@ -264,14 +282,19 @@ Montar el entorno de desarrollo real: conectar base de datos, activar Flyway con
 - [x] `application.yml` base configurado (nombre y puerto)
 - [x] Entidad JPA sincronizada (`AccountJpaEntity` con currency, status, createdAt)
 - [x] Adaptador de persistencia (`AccountPersistenceAdapter`) sincronizado con `Money` y `currency`
-- [ ] Crear perfiles: `application-dev.yml` (H2 + Flyway) y `application-test.yml` (H2 tests)
-- [ ] `ddl-auto: validate` en dev, `create-drop` solo en test
-- [ ] Primera migración Flyway: `V1__create_accounts_table.sql`
-- [ ] La app arranca con `./mvnw spring-boot:run -Dspring-boot.run.profiles=dev`
+- [x] Crear perfiles: `application-dev.yml` (H2 + Flyway) y `application-test.yml` (H2 tests)
+- [x] `ddl-auto: validate` en dev, `create-drop` solo en test
+- [x] Primera migración Flyway: `V1__create_accounts_table.sql`
+- [x] La app compila con Java 21 (`JAVA_HOME=/home/chrferlop/.jdks/ms-21.0.12.1 ./mvnw compile`)
 
-> 💡 **Contexto al retomar en clase / siguiente sesión**:
-> - La app compila al 100% y los tests están en verde.
-> - **Siguiente paso recomendado**: Crear la migración Flyway `V1__create_accounts_table.sql` y los perfiles `application-dev.yml`/`application-test.yml` para cerrar la Fase 0, o bien saltar directamente a la **Fase 1** creando `AccountStatus.java` (Enum) y reforzando `Money.java`.
+> 💡 **Contexto al retomar en la siguiente sesión (en nuevo chat)**:
+> - **Fase 0** cerrada al 100%.
+> - **Fase 1 (En progreso)**:
+>   - ✅ Creados: `AccountStatus.java` (Enum rico), `AccountId.java` y `UserId.java` (Records tipados).
+>   - ✅ Creada jerarquía de excepciones de dominio: `DomainException.java`, `AccountNotFoundException.java`, `AccountNotActiveException.java`, `CurrencyMismatchException.java`, `InsufficientFundsException.java`.
+>   - ✅ Refactorizado: `Money.java` (Value Object completo con 4 decimales, equals/hashCode por valor, of/zero, operaciones inmutables y validaciones).
+>   - 🔴 **Punto exacto de reanudación**: **Fase 1 - Lote 3: Domain Events** (`DomainEvent.java` como `sealed interface` y los records de eventos: `AccountOpenedEvent`, `MoneyDepositedEvent`, `MoneyWithdrawnEvent`, `AccountBlockedEvent`, `AccountClosedEvent`).
+> - **Regla activa**: Consultar al usuario antes de modificar código, explicar teoría y contrastar opciones (ver `GEMINI.md`).
 
 ---
 
@@ -282,11 +305,11 @@ Construir toda la capa `domain/` con Java puro: Value Objects ricos (Money, Acco
 UserId), Aggregate Root (Account) con toda la lógica de negocio, Domain Events como sealed
 interface, excepciones de dominio propias, y el Domain Service de transferencias.
 
-- [ ] `Money.java` — Value Object completo: final, inmutable, factory methods, add/subtract, equals por valor, BigDecimal con escala fija
-- [ ] `AccountId.java` y `UserId.java` — records con validación de no-nulo y factory methods
-- [ ] `AccountStatus.java` — enum con `allowsOperations()` y `canBeReactivated()`
-- [ ] `DomainException.java` — clase base abstracta (extends RuntimeException)
-- [ ] `InsufficientFundsException`, `AccountNotActiveException`, `CurrencyMismatchException`, `AccountNotFoundException`
+- [x] `Money.java` — Value Object completo: final, inmutable, factory methods, add/subtract, equals por valor, BigDecimal con escala fija
+- [x] `AccountId.java` y `UserId.java` — records con validación de no-nulo y factory methods
+- [x] `AccountStatus.java` — enum con `allowsOperations()` y `canBeReactivated()`
+- [x] `DomainException.java` — clase base abstracta (extends RuntimeException)
+- [x] `InsufficientFundsException`, `AccountNotActiveException`, `CurrencyMismatchException`, `AccountNotFoundException`
 - [ ] `DomainEvent` — sealed interface con `occurredOn()`
 - [ ] `AccountOpenedEvent`, `MoneyDepositedEvent`, `MoneyWithdrawnEvent`, `AccountBlockedEvent`, `AccountClosedEvent` — records
 - [ ] `Account.java` — Aggregate Root con `open()`, `reconstitute()`, `deposit()`, `withdraw()`, `block()`, `unblock()`, `close()`, `pullDomainEvents()`
@@ -456,7 +479,7 @@ Oct 2026                                                         Mar/Abr 2027
 ## ✅ Progreso general
 
 - [x] **Fase 0** — Setup (Perfiles, Flyway, Base de datos en memoria lista)
-- [ ] **Fase 1** — Dominio DDD (Value Objects, Aggregate, Events, Exceptions)
+- [ ] **Fase 1** — Dominio DDD (En progreso: Lotes 1 y 2 completados, pendiente Lote 3 Domain Events)
 - [ ] **Fase 2** — Aplicación (Use Cases, Commands, Services)
 - [ ] **Fase 3** — Infraestructura (REST, JPA, Events, Config)
 - [ ] **Fase 4** — Testing (dominio, aplicación, ArchUnit)
