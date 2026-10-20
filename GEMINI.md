@@ -1,14 +1,11 @@
-# Reglas del proyecto NeoBank
+# NeoBank — Configuración IA
 
-## Regla 1: Confirmación antes de escribir código
+Las reglas de colaboración y el contexto del proyecto para agentes IA están en la carpeta `.ai/`:
 
-- **SIEMPRE** preguntar al usuario antes de crear, modificar o borrar cualquier archivo de código fuente.
-- No escribir ni modificar código sin aprobación explícita del usuario.
-- Presentar el contenido propuesto y esperar confirmación antes de ejecutar.
+- `.ai/reglas.md` — Cómo debe comportarse la IA
+- `.ai/estado.md` — Estado actual del proyecto (handoff entre sesiones)
+- `.ai/contexto.md` — Resumen compacto del proyecto
+- `.ai/errores.md` — Log de errores
+- `.ai/decisiones.md` — Decisiones arquitectónicas (ADRs)
 
-## Regla 2: Explicar alternativas y justificar decisiones
-
-- Antes de proponer código, explicar el **concepto teórico** detrás de lo que se va a implementar.
-- Presentar **opciones** al usuario con pros/contras de cada una, para que elija a su criterio.
-- Siempre comparar: **¿por qué esta opción y no otra?** Justificar la decisión elegida frente a las alternativas descartadas.
-- El objetivo es que el usuario entienda el POR QUÉ, no solo el QUÉ.
+**Protocolo de inicio de sesión**: leer `.ai/reglas.md` + `.ai/estado.md`. Si es la primera vez, leer también `.ai/contexto.md`.

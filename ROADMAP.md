@@ -36,6 +36,36 @@ objetivo personal de aprender bien y tener un portfolio sólido.
 instrucciones, explica el POR QUÉ de cada decisión. No asumas conocimientos avanzados.
 Los conceptos nuevos deben introducirse uno a uno, no todos a la vez.
 
+### 🤖 Modelo de colaboración con IA — "Arquitecto / Revisor + Memory Bank"
+
+> **Principio**: La IA NO genera código de implementación. Christian escribe TODO.
+> La IA diseña, especifica contratos, y destruye el código cuando Christian se lo trae.
+
+#### Memory Bank y Handoffs
+
+La carpeta `.ai/` contiene el Memory Bank del proyecto:
+- `.ai/reglas.md` — Cómo colaborar (la IA lo lee SIEMPRE al inicio)
+- `.ai/estado.md` — Estado actual y punto de reanudación (se actualiza cada sesión)
+- `.ai/contexto.md` — Resumen compacto del proyecto (la IA lo lee solo la primera vez)
+- `.ai/errores.md` — Log de errores encontrados y cómo se resolvieron
+- `.ai/decisiones.md` — Decisiones arquitectónicas (ADRs)
+
+La IA **NO lee el repositorio automáticamente**. Christian trae el código que quiere revisar.
+
+#### Flujo de trabajo por cada tarea
+
+| Fase | Quién | Qué hace |
+|------|-------|----------|
+| **1. Diseño** | IA | Explica el concepto teórico. Define el contrato: interfaces, firmas de métodos, responsabilidades, invariantes. NO genera implementación |
+| **2. Implementación** | Christian | Escribe el código siguiendo la especificación. Se come los efectos cascada de sus propios cambios |
+| **3. "Destroy my code"** | IA | Christian trae su código y la IA lo destroza: ¿dónde rompe DDD? ¿ha acoplado infraestructura en el dominio? ¿viola SOLID? |
+| **4. Iteración** | Christian | Corrige según el feedback. Vuelve a traer el código. Repetir hasta que esté limpio |
+| **5. Handoff** | Ambos | Se actualiza `.ai/estado.md` con el estado exacto para la siguiente sesión |
+
+> Ver reglas completas en `.ai/reglas.md` y `GEMINI.md`.
+
+---
+
 ### Alcance actual del roadmap
 
 | Incluido | NO incluido (futuro) |
@@ -294,7 +324,7 @@ Montar el entorno de desarrollo real: conectar base de datos, activar Flyway con
 >   - ✅ Creada jerarquía de excepciones de dominio: `DomainException.java`, `AccountNotFoundException.java`, `AccountNotActiveException.java`, `CurrencyMismatchException.java`, `InsufficientFundsException.java`.
 >   - ✅ Refactorizado: `Money.java` (Value Object completo con 4 decimales, equals/hashCode por valor, of/zero, operaciones inmutables y validaciones).
 >   - 🔴 **Punto exacto de reanudación**: **Fase 1 - Lote 3: Domain Events** (`DomainEvent.java` como `sealed interface` y los records de eventos: `AccountOpenedEvent`, `MoneyDepositedEvent`, `MoneyWithdrawnEvent`, `AccountBlockedEvent`, `AccountClosedEvent`).
-> - **Regla activa**: Consultar al usuario antes de modificar código, explicar teoría y contrastar opciones (ver `GEMINI.md`).
+> - **Modelo de colaboración**: Patrón "Arquitecto / Revisor + Memory Bank" — la IA diseña contratos y destruye código; Christian escribe TODA la implementación y se come los efectos cascada. Cero lectura automática del repo (ver `.ai/reglas.md` y `GEMINI.md`).
 
 ---
 
