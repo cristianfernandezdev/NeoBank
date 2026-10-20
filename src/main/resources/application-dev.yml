@@ -1,0 +1,29 @@
+# Perfil DEV — se activa cuando arrancas con -Dspring-boot.run.profiles=dev
+# Usamos H2 en memoria: no necesitas instalar nada, arranca al instante
+
+spring:
+
+  datasource:
+    url: jdbc:h2:mem:neobank_dev  # Base de datos en memoria — se borra al parar la app
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  h2:
+    console:
+      enabled: true  # Activa la consola web de H2 → http://localhost:8080/h2-console
+                     # Muy útil para ver las tablas mientras desarrollas
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true          # Muestra el SQL en consola — útil para aprender qué hace Hibernate
+    properties:
+      hibernate:
+        format_sql: true    # Lo formatea bonito, más legible
+    hibernate:
+      ddl-auto: validate    # Con Flyway activo, Hibernate solo valida que las tablas coincidan
+                            # Nunca crea ni modifica tablas — eso lo hace Flyway
+
+  flyway:
+    enabled: true           # Flyway activo en desarrollo
+    locations: classpath:db/migration  # Carpeta donde pondremos los archivos .sql

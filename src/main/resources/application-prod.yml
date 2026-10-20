@@ -1,0 +1,20 @@
+# Perfil PROD — se activa con -Dspring-boot.run.profiles=prod
+# Conecta a tu base de datos PostgreSQL real en AWS (RDS)
+
+spring:
+
+  datasource:
+    url: jdbc:postgresql://pizzeria-db.cu4eihxvrwi7.us-east-1.rds.amazonaws.com:5432/neobank
+    username: pizzeria_user
+    password: prueba1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false         # En producción no mostramos el SQL por seguridad y rendimiento
+    hibernate:
+      ddl-auto: validate    # Seguridad total: Hibernate jamás borra ni altera tablas en AWS
+
+  flyway:
+    enabled: false          # Flyway gestiona las migraciones versionadas en AWS
+    locations: classpath:db/migration

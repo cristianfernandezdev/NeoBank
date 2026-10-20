@@ -1,0 +1,20 @@
+# Perfil TEST — se activa automáticamente cuando ejecutas ./mvnw test
+# Los tests necesitan una base de datos limpia cada vez → H2 en memoria
+
+spring:
+
+  datasource:
+    url: jdbc:h2:mem:neobank_test  # Base de datos separada de dev — no se mezclan
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: false       # En tests no queremos ver el SQL — demasiado ruido en la consola
+    hibernate:
+      ddl-auto: create-drop  # En tests SÍ dejamos que Hibernate cree y borre las tablas
+                              # No usamos Flyway en tests → más rápido y más simple
+
+  flyway:
+    enabled: false  # Flyway desactivado en tests — las tablas las crea Hibernate directamente.
