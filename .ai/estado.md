@@ -11,7 +11,11 @@
 - [x] **Fase 1 Lote 2** — Excepciones de dominio (DomainException, 4 excepciones concretas)
 
 ### Punto exacto de reanudación
-**Fase 1 — Lote 3: Domain Events**
+**Repaso de conceptos / Glosario (en progreso):**
+- Glosario completado: Arquitectura (Hexagonal, Port, Adapter, Regla dependencias), DDD Táctico (DDD, Value Object, Domain Exception), Java/Patrones (Inmutabilidad, Factory Method, Record, Enum rico, Objeto auto-validante), SOLID (ISP).
+- Pendiente en glosario: SRP (asentar concepto), Aggregate Root (revisar en Lote 4), Flyway y Constructor Injection.
+
+**Fase 1 — Lote 3: Domain Events (código pendiente)**
 - Crear `DomainEvent` como sealed interface con `occurredOn()` en `domain/event/`
 - Crear 5 records: AccountOpenedEvent, MoneyDepositedEvent, MoneyWithdrawnEvent, AccountBlockedEvent, AccountClosedEvent
 
