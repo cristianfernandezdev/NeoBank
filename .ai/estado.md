@@ -12,8 +12,9 @@
 
 ### Punto exacto de reanudación
 **Repaso de conceptos / Glosario (en progreso):**
-- Glosario completado: Arquitectura (Hexagonal, Port, Adapter, Regla dependencias), DDD Táctico (DDD, Value Object, Domain Exception), Java/Patrones (Inmutabilidad, Factory Method, Record, Enum rico, Objeto auto-validante), SOLID (ISP).
-- Pendiente en glosario: SRP (asentar concepto), Aggregate Root (revisar en Lote 4), Flyway y Constructor Injection.
+- Glosario completado: Arquitectura (Hexagonal, Port, Adapter, Regla dependencias), DDD Táctico (DDD, Value Object, Domain Exception), Java/Patrones (Inmutabilidad, Factory Method, Record, Enum rico, Objeto auto-validante, Inyección por constructor), SOLID (ISP, SRP), Persistencia (Flyway).
+- Pendientes de lo ya programado: Primitive Obsession e IDs tipados, Invariante de dominio, Precisión monetaria (BigDecimal vs float/double), DIP, Entidad Dominio vs Entidad JPA, BeanConfiguration.
+- Pendientes para próximos lotes: Aggregate Root (Lote 4), Domain Events (Lote 3).
 
 **Fase 1 — Lote 3: Domain Events (código pendiente)**
 - Crear `DomainEvent` como sealed interface con `occurredOn()` en `domain/event/`

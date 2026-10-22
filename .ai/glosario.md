@@ -45,7 +45,18 @@ Enumerado que no solo lista constantes o etiquetas, sino que contiene lógica de
 ### Objeto auto-validante
 Objeto que comprueba sus propias reglas e invariantes en el momento de su construcción (ej. con Objects.requireNonNull o validaciones de negocio). Si los datos son erróneos falla de inmediato (Fail Fast), garantizando que cualquier instancia que exista en el sistema sea siempre 100% válida.
 
+### Inyección por constructor (Constructor Injection)
+Pasar las dependencias obligatoriamente a través del constructor de la clase en lugar de inyectarlas con `@Autowired` en atributos privados. Permite declarar los campos como `final` (inmutables), evita que el objeto se cree a medias o con dependencias nulas (Fail-Fast), y facilita los tests unitarios rápidos ya que podemos instanciar la clase pasando mocks directamente con `new` sin depender de Spring ni de trucos de reflexión.
+
 ## Principios de diseño (SOLID)
+
+### SRP (Principio de Responsabilidad Única)
+Una clase debe ocuparse de una sola cosa y tener una única razón para cambiar. Por ejemplo, una entidad tiene sus reglas de negocio pero no debe saber cómo guardarse en la base de datos ni gestionar transferencias ajenas a ella; así, si cambia la base de datos, no rompemos ni modificamos el modelo de negocio.
 
 ### ISP (Principio de Segregación de Interfaces)
 Una clase no debe verse obligada a depender de métodos o interfaces que no utiliza. En lugar de crear interfaces gigantes con muchas operaciones, se crean interfaces pequeñas y específicas para cada necesidad (ej. un caso de uso = un método como CreateAccountUseCase).
+
+## Persistencia e Infraestructura
+
+### Flyway (Migraciones de base de datos)
+Herramienta que actúa como un "control de versiones" para la base de datos mediante scripts SQL versionados y ordenados (`V1__...`, `V2__...`). Evita el peligro de `ddl-auto: update` de Hibernate (que puede borrar columnas o corromper datos al intentar adivinar los cambios) y garantiza que el esquema de la base de datos sea exactamente el mismo y reproducible en desarrollo (H2) y en producción (PostgreSQL).
