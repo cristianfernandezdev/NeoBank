@@ -8,5 +8,4 @@ import java.util.UUID;
 // "Si quieres crear una cuenta, pásame el UUID de un usuario y yo te devolveré el UUID de la nueva cuenta".
 public interface CreateAccountUseCase {
     UUID create(UUID userId, Currency currency);
-
 }
