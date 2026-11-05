@@ -46,6 +46,7 @@ Plan consolidado el 26 Oct 2026 a partir de la planificación anterior. Las hora
 - Se conserva la meta orientativa de cobertura superior al 80 % en dominio/aplicación, como señal secundaria: no sustituye probar invariantes y escenarios de fallo.
 - Antes de transferencias completas, definir y comprobar atomicidad y operaciones simultáneas. Antes de producción, verificar migraciones y persistencia contra PostgreSQL y resolver la configuración externa.
 - Los nombres previstos de clases o migraciones se concretan en cada bloque según el código existente; evitar fijar un número de migración que pueda estar ocupado. El publicador de eventos no garantiza por sí solo entrega fiable.
+- Preferencia de Christian (5 Nov 2026): todos los mensajes de commit deben estar siempre en inglés, tanto el título como el cuerpo.
 - Historial de commits descriptivos; se conserva Conventional Commits como guía. Una revisión o sesión de tutoría no autoriza crear commits.
 
 ## Referencias de estudio conservadas

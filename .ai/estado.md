@@ -61,6 +61,7 @@ Se mantiene **Fase 1 — Lote 3: Domain Events**. Al recibir «seguimos», la IA
 
 ### Dudas abiertas y alcance siguiente
 
+- **Lectura pendiente solicitada por Christian:** [Diseñar un modelo de dominio de microservicio — Microsoft Learn](https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/microservice-domain-model). Guardado al cerrar la sesión para leer al día siguiente. Relacionado con el repaso de una cuenta mutable que sustituye su saldo por nuevos objetos `Money` inmutables; empezar por la sección «The Domain Entity pattern». Lectura aún no realizada.
 - Ajustar el apoyo según los intentos y la revisión del bloque, sin exigir un examen previo ni una propuesta arquitectónica desde cero para un concepto nuevo.
 - Las convenciones técnicas se mantienen; las recomendaciones nuevas no se consideran decisiones aceptadas hasta acordarlas.
 - Una próxima tutoría o revisión no autoriza actualizar archivos automáticamente. Entregar el cierre en el chat salvo que Christian autorice guardar los avances.
