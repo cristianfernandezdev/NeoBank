@@ -30,7 +30,7 @@ public class Account {
     public UUID getUserId() { return userId; }
     public Money getBalance() { return balance; }
 
-    // 4. LÓGICA DE NEGOCIO PURA (Refactorizada a Money)
+    // 4. LÓGICA DE NEGgitOCIO PURA (Refactorizada a Money)
     public void deposit(Money amount) {
 
         this.balance = this.balance.add(amount);
