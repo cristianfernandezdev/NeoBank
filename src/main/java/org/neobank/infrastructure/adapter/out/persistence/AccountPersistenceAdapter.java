@@ -16,12 +16,12 @@ public class AccountPersistenceAdapter implements SaveAccountPort {
         // 1. Mapeo Manual (Data Mapper)
         // Usamos el constructor que nos generó Lombok (@AllArgsConstructor) en la entidad JPA
         AccountJpaEntity entity = new AccountJpaEntity(
-                account.getId(),
-                account.getUserId(),
+                account.getId().value(),
+                account.getUserId().value(),
                 account.getBalance().getAmount(),
                 account.getBalance().getCurrency().getCurrencyCode(),
-                "ACTIVE",
-                java.time.Instant.now()
+                account.getStatus().name(),
+                account.getCreatedAt()
         );
 
         // 2. Ejecutar la persistencia

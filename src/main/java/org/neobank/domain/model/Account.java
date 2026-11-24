@@ -1,11 +1,11 @@
 package org.neobank.domain.model;
 
+import org.neobank.domain.event.AccountOpenedEvent;
+import org.neobank.domain.event.DomainEvent;
+
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Currency;
-import java.util.Objects;
-import java.util.UUID;
-
+import java.util.*;
 
 
 public class Account {
@@ -14,9 +14,11 @@ public class Account {
     private final UserId userId;
     private Money balance;
     private  AccountStatus accountStatus;
-    private final Instant createdAt;// Mantenemos el nombre 'balance', pero ahora es de tipo Money
+    private final Instant createdAt;
+    private final List<DomainEvent> events;
+    // Mantenemos el nombre 'balance', pero ahora es de tipo Money
 
-    // 1. CONSTRUCTOR PARA CREAR CUENTAS NUEVAS
+    // 1. CONSTRUCTOR PARA CREAR CUENTAS NUEVASco
     // Ahora exigimos que el Servicio nos diga en qué moneda se abre la cuenta
 
     // 2. CONSTRUCTOR PARA RECONSTRUIR CUENTAS (Desde la base de datos)
@@ -27,6 +29,7 @@ public class Account {
         this.balance = Objects.requireNonNull(balance, "El saldo no puede ser nulo");
         this.accountStatus = Objects.requireNonNull(accountStatus, "El estado de la cuenta no puede ser nulo");
         this.createdAt = Objects.requireNonNull(createdAt, "La fecha de creación no puede ser nula");
+        events = new ArrayList<>();
     }
 
     public AccountId getId() { return accountId; }
@@ -40,10 +43,21 @@ public class Account {
         this.balance = this.balance.add(amount);
     }
     public static Account open(UserId userId,Currency currency) {
-        return new Account(AccountId.generate(), userId, Money.zero(currency), AccountStatus.ACTIVE, Instant.now());
+        Account account = new Account(AccountId.generate(), userId, Money.zero(currency), AccountStatus.ACTIVE, Instant.now());
+        account.addEvent(new AccountOpenedEvent(account.accountId,account.userId,account.createdAt));
+        return account;
     }
     public static Account reconstitute(AccountId accountId, UserId userId, Money balance, AccountStatus accountStatus, Instant createdAt) {
         return new Account(accountId, userId, balance, accountStatus, createdAt);
+    }
+    private void addEvent(DomainEvent event) {
+        this.events.add(event);
+    }
+
+    public List<DomainEvent> getEvents() {
+        List<DomainEvent> events = List.copyOf(this.events);
+        this.events.clear();
+        return events;
     }
 
     public void withdraw(Money amount) {
